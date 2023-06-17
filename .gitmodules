@@ -1,6 +1,6 @@
-[submodule "FriendHub"]
+[submodule "FriendHub-backend"]
 	path = backend
-	url = https://github.com/radu781/FriendHub
+	url = https://github.com/radu781/FriendHub-backend
 [submodule "FriendHub-tools"]
 	path = tools
 	url = https://github.com/radu781/FriendHub-tools

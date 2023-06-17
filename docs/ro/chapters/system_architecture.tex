@@ -1,0 +1,89 @@
+
+\chapter{Arhitectura sistemului}
+\label{Arhitectura sistemului}
+    \section{Arhitectura generală}
+    \label{Arhitectura generală}
+    Ca orice aplicație centralizată creată pentru a servi clienților, proiectul este împărțit pe două componente: cea cu care clientul interacționează (frontend) și cea care se ocupă de logică (backend).
+
+    Aplicația folosește modelul MVC (model-view-controller) pentru a avea o mai bună organizare a codului și a separa reprezentările interne ale informației de modul în care informația ajunge și este folosită de client. Acesst model arhitectural este des întâlnit în aplicații cu interfață grafică (GUI), și din ce în ce mai des și pe pagini web. 
+    
+    Ca mod de funcționare:
+    \begin{enumerate}[noitemsep, label=\textbullet, leftmargin=0.3cm]
+        \item Utilizatorul folosește controller-ul, adică atunci când face click pe un buton, caută un alt utilizator după nume, sau dă scroll pe pagina principală pentru a încărca mai multe postări se face request la un anume endpoint creat de controller. Acesta acceptă informația primită de la utilizator și o procesează pentru a crea comenzi ce vor fi folosite de model.
+        \item Controller-ul manipulează datele din model, componenta centrală ce presupune gestionarea datelor și a logicii. În model se calculează recomandările de postări și de prieteni în funcție de preferințele utilizatorului, a grupurilor din care face parte și a interacțiunilor cu postări în trecut.
+        \item Modelul furnizează și actualizează interfața, o reprezentare cât mai ușoară de înțeles a datelor, care mai apoi va fi folosită de utilizator. Interfața urmează un design minimalist, care prioritizează acțiunile cele mai comune la un moment dat, ascunzându-le pe cele mai puțin frecvente. 
+    \end{enumerate}
+    
+    \section{Backend}
+    \label{Backend}
+    Partea de backend se ocupă de autentificare, conexiunea cu baza de date, procesarea datelor și expune un API public.
+    \subsection{Tehnologii folosite}
+    \label{Backend-tehnologii}
+    Limbajul de programare folosit pentru partea de backend este python, un limbaj de nivel înalt, multi-paradigmă, cu scop general. Având tipuri de date dinamice, o librărie standard foarte complexă și fiind garbage-collected, python a devenit un limbaj folosit din ce în ce mai des pentru ușurința de a dezvolta aplicații pornind de la mici scripturi folosite la linia de comandă, la automatizare, machine learning, web scraping până la aplicații web sau desktop. 
+
+    Flask este un framework WSGI folosit pentru crearea aplicațiilor web. Chiar dacă este conceput pentru crearea rapidă a proiectelor, poate scala ușor pentru aplicații mai complexe, fără a crea probleme legate de aspecte low-level precum organizarea firelor de execuție, a conexiunilor cu clienții și per total a protocolului folosit. Fiind open source, există o multitudine de unelte și îmbunătățiri create de diverși dezvoltatori. În producție, este folosit de multe companii: reddit, uber, trivago.
+
+    Librării:
+    \begin{enumerate}[noitemsep]
+        \item qrcode ...
+    \end{enumerate}
+
+    \subsection{Controller}
+    \label{Controller}
+    Procesare date introduse de utilizator ...
+
+    Logică internă ...
+
+    Expunerea unui API (Application Programming Interface) ...
+    \subsection{Autentificare și autorizare}
+    \label{Autentificare}
+    ...
+    \subsection{Baza de date}
+    \label{Baza de date}
+    Postgresql
+
+    SQL vs NoSQL, alternative
+
+    Indecși
+
+    Alegere tipuri de date/formatul datelor
+    \subsection{Integrare cu servicii externe}
+    \label{Integrare cu servicii externe}
+    Aplicația folosește date obținute de terți folosind API publice și gratuite, limitarea fiind doar volumul de date care poate fi transferat. Unele resurse pot fi accesate din profilul utilizatorului pentru a seta preferințe ce pot ajuta la găsirea de prieteni sau de grupuri relevante.
+
+    \begin{enumerate}[noitemsep, leftmargin=0.3cm]
+        \item IMDB - preferințe filme și seriale
+        \item Spotify - preferințe muzică
+        \item IGBD - preferințe jocuri - datele sunt luate de pe Twitch
+        \item My Anime List - preferințe anime
+    \end{enumerate}
+
+    \section{Frontend}
+    \label{Frontend}
+    Partea de frontend se ocupă de aspectul interfeței utilizatorului și de experiența acestuia când navighează paginile, meniurile, sau folosește aplicația în orice alt mod.
+    \subsection{Tehnologii folosite}
+    \label{Frontend-tehnologii}
+    Limbajul de programare folosit pentru partea de frontend este rust, un limbaj multi-paradigmă ce excelează în performanță, asigurarea siguranței tipurilor de date și concurență. Impune siguranța memoriei fără a se folosi de un garbage collector și previne accesul destructiv și concurent la resurse partajate, în schimb folosește un sistem de "borrow checking" ce urmărește durata de viață a unui obiect la compilare. Chiar dacă este folosit în principal pentru programare software, are funcționalități de nivel înalt și un package manager ce permit folosirea pentru multe alte arii.
+
+    \begin{quote}
+        "Rust este de șapte ani cel mai îndrăgit limbaj, 87\% din dezvoltatori spunând că vor să îl folosească în continuare." \hyperref[stackoverflow-studiu-2022]{\textsuperscript{[1]}}
+    \end{quote}
+
+    Yew este un framework folosit pentru crearea aplicațiilor web, bazat pe componente ce ajută la crearea ușoară a interfețelor grafice. Fiind bazat pe React din punctul de vedere al funcționalității și sintaxei, codul poate fi ușor convertit, iar documentații și ghiduri pentru React pot fi folosite ca referință pentru aplicații în yew. O diferență majoră este faptul că yew folosește WebAssembly pentru a executa codul, în defavoarea Javascript. WASM este un limbaj care poate rula în browsere moderne cu performanță aproape de nativ, poate interacționa cu cod deja existent în Javascript și paote fi generat de diverse limbaje compilate.
+
+    Lirbării:
+    \begin{enumerate}[noitemsep]
+        \item Reqwest - request-uri HTTP asincrone ...
+        \item Serde - serializer/deserializer JSON ...
+        \item Stylist - macro-uri procedurale pentru încorporarea fișierelor CSS ...
+    \end{enumerate}
+    
+    \section{Aspecte de securitate}
+    \label{Aspecte de securitate}
+    Stocare JWT ...
+
+    Autentificare ...
+
+    Email-uri de confirmate/securitate ...
+    
+\newpage
