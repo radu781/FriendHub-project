@@ -7,3 +7,9 @@
 [submodule "FriendHub-frontend"]
 	path = frontend
 	url = https://github.com/radu781/FriendHub-frontend
+[submodule "FriendHub-desktop"]
+	path = desktop
+	url = https://github.com/radu781/FriendHub-desktop
+[submodule "FriendHub-live"]
+	path = live
+	url = https://github.com/radu781/FriendHub-live
