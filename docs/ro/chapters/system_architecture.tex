@@ -14,9 +14,27 @@
         \item Modelul furnizează și actualizează interfața, o reprezentare cât mai ușoară de înțeles a datelor, care mai apoi va fi folosită de utilizator. Interfața urmează un design minimalist, care prioritizează acțiunile cele mai comune la un moment dat, ascunzându-le pe cele mai puțin frecvente. 
     \end{enumerate}
     
+    \section{Communication}
+    \subsection{WSGI}
+    A Web Server Gateway Interface is the name given to web servers that send requests to web based applications written using the python language. It is an interface between web servers and web applications that makes portability possible and has two sides: a gateway that runs either Apache or Nginx and an application that is the python codebase itself. The way the applicaton is started, configured or loaded is not specified, so depending on the framework used, developers might need to make custom adjustments to start their server.
+    WSGI also supports middleware: a component that can route requests, enable load balancing, developer debugging and profiling.
+    \subsection{Socket.IO}
+    Socket.IO is a scalable library designed to real time web applications that enables bidirectional communication between the server and web clients. The API on both sides is similar. The connection is usually made using WebSocket, thus providing little overhead in the communication process.
+    \subsection{gRPC}
+    gRPC Remote Procedure Calls is a high performance RPC framework. It was originally designed by Google and is now used in many organizations other than Google in microservices, mobile, web and Internet of Things.
+
+    Protocol buffers are used as the IDL(interface definition language) and includes features such as authentication, flow control, blocking or non blocking bindings, and bidirectionial data streaming. It can generate cross platform server and client bindings for many languages. They are used to serialize and deserialize structured data, usually over networks, while being faster than json, xml or other text based serialization methods. Data is compact, forward and backward compatible, but not self describing (meaning that names, datatypes, methods cannot be known without also having the proto file). Messages(data structure schemas) and services are defined in a proto file and later compiled. This generates code that can be used by a sender or reciever that can represent those data structures. The best use case for this kind of file is for small data chunks that are only loaded into memory and should not be used for streaming data.
+    
     \section{Backend}
     \label{Backend}
-    Partea de backend se ocupă de autentificare, conexiunea cu baza de date, procesarea datelor și expune un API public.
+    Partea de backend se ocupă de autentificare, conexiunea cu baza de date, procesarea datelor și expune un API public. This is split into multiple functional parts:
+    \begin{enumerate}[noitemsep, label=\textbullet, leftmargin=0.3cm]
+        \item a WSGI server that creates the controller with its endpoints that are used to nagivate between pages
+        \item a Socket.IO server that enables users to use instant messaging
+        \item a gRPC server used to communicate between the main WSGI server and real time notifications or various self made micro services
+    \end{enumerate}
+
+    
     \subsection{Tehnologii folosite}
     \label{Backend-tehnologii}
     Limbajul de programare folosit pentru partea de backend este python, un limbaj de nivel înalt, multi-paradigmă, cu scop general. Având tipuri de date dinamice, o librărie standard foarte complexă și fiind garbage-collected, python a devenit un limbaj folosit din ce în ce mai des pentru ușurința de a dezvolta aplicații pornind de la mici scripturi folosite la linia de comandă, la automatizare, machine learning, web scraping până la aplicații web sau desktop. 
@@ -57,6 +75,36 @@
         \item IGBD - preferințe jocuri - datele sunt luate de pe Twitch
         \item My Anime List - preferințe anime
     \end{enumerate}
+    
+    \subsection{Other tools}
+    \label{Other tools}
+    The application uses several tools written in rust that compute various data either at fixed points in time, or as needed. These tools are comand line interface applicatons that serve singular purposes. These could have been defined as microservices, but for the sake of simplicity and avoiding the problem where an application has more microservices than active users, they are executables called by the controller.
+
+    These tools share a common error outputting interface, every possible failable case is treated and either handled or by graceful exit. In the controller, depending on the tools's exit code, the action may be repeated up to a maximum number of types. A priority queue system has been implemented in order to facilitate this.
+
+    Since all of these are command line tools, a common library used was clap (TODO: add reference), a full featured, fast command line argument parser that uses procedural macros on structs in order to define possible commands and flags.
+
+    \subsubsection{Database lib}
+    A wrapper over the database tables has been written in order to facilitate database related queries, run them asynchronously, and ensure safety and query corectness at compile time, even before the code runs. The library also logs the data it manipulates so it can be manually be reviewed or automatically reverted. It abstracts away the low level and error prone SQL queries.
+    
+    The library used for this is sqlx (TODO: add reference), a rust SQL toolkit that creates compile time checked queries for PostreSQL, MySQL, MariaDB and SQLite meaning that if the code compiles, the interactions with the database are correct and crash free. When reading multiple rows from a table, data streaming is supported, so rows are read and decoded asynchronously and on demand. This library uses macros to run queries at compile time to check the table column types, restrictions, triggers, can map to objects created in rust either automatically or manually (for conversions, for example char to UUID).
+    
+    \subsubsection{Email}
+    The application uses emails to inform the user of specific events: new registration, login from unknown device, password reset. The email type and relevant information is provided as command line arguments, then the email is rendered and sent to the recipient.
+
+    The rendering library used is tera (TODO: add reference). It is easy to use, performant and uses Jinja2 template files which are widely used. Conditional rendering is supported, as well as loops filters and inheritance. The email sent is an html file that can support inline CSS and javascript. The templates are loaded at compile time, which makes the tool very portable, since for using it, only the executable needs to be copied, without the various Jinja2 files.
+
+    For sending the emails, the library of choice was lettre (TODO: add reference). It supports multiple transport methods, unicode, SMTP and can be used asynchronously. The API is easy to use and setting up a message that uses Google's gmail STMP server can be done in a couple of lines.
+    
+    \subsubsection{Activity tracker}
+    A part of the application is to be able to compare a user's daily or montly activity and engagement to the website. This component is gamified, in which different metrics have different weights based on the ammount of effort the action required and its type. Positive and creational inputs have a higher weight in order to encourage good morale and to guide users to avoid bad behaviours (trolling, negative comments, hate).
+
+    Other than clap, this tool uses the internal database library mentioned above in order to compute a user's activity score in a certain day and store it back in the databse. The metrics that take part in this computation are: number of posts, number of upvotes and downvotes given, number of new friends added, number of comments and replies written, number of timed story posts, number of comment/reply chains created, number of groups joined. Bad behaviour on the platform, depending on its kind, can be punished by an activity negative multiplier, while streaks award positive multipliers.
+    
+    \subsubsection{Data mock}
+    In order to test different scenarios, to create relationships between test users and for demonstration purposes, some of the data is generated. Instead of using random text or fragments of lorem ipsum, plausible data is inserted into the database.
+
+    By using fake-rs (TODO: add reference), fake data can be easily generated in order to create users (names, locations, addresses), posts, pages, comments (text, upvote/downvote count). This library uses procedural macros to specity the types of generated data, and can also support parameters, such as creating names longer than 3 characters, numbers in a given interval, sentences with a given length, dates and much more.
 
     \section{Frontend}
     \label{Frontend}
@@ -77,6 +125,26 @@
         \item Serde - serializer/deserializer JSON ...
         \item Stylist - macro-uri procedurale pentru încorporarea fișierelor CSS ...
     \end{enumerate}
+    
+    \section{Interconnected}
+    \label{Interconnected}
+    ...
+    
+    \subsection{Technologies used}
+    \label{Interconnected-technologies}
+    ... 
+    
+    \subsection{Instant messaging}
+    \label{Instant messaging}
+    ...
+    
+    \subsection{Live notificatons}
+    \label{Live notifications}
+    ...
+    
+    \subsection{Microservices}
+    \label{Microservices}
+    ...
     
     \section{Aspecte de securitate}
     \label{Aspecte de securitate}
