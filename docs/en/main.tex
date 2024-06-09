@@ -1,0 +1,75 @@
+\documentclass[12pt]{report}
+% \documentclass{article}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+% includes
+\usepackage{geometry}           % page size
+% \usepackage[utf8]{inputenc}     % encoding
+% \usepackage{palatino}           % font
+\usepackage[english]{babel}    % language
+\usepackage{indentfirst}        % indentation
+% \usepackage[nottoc]{tocbibind}  % table of contents style
+\geometry{  a4paper,            % scientific thesis standard
+            left=3cm,
+            right=2cm,
+            top=2cm,
+            bottom=2cm,
+ }
+\setlength{\parindent}{1cm}     % paragraph indentation
+
+% other options
+\renewcommand*\contentsname{Contents}    % table of contents name
+\begin{document}
+    \input{utils/macros}
+    \pagenumbering{gobble}
+    
+    \input{pages/cover}
+    \newpage
+    \hspace{0pt}
+    \newpage
+    
+    \input{pages/title}
+    \newpage
+    \hspace{0pt}
+    \newpage
+    
+    \input{pages/registration}
+    \newpage
+    \hspace{0pt}
+    \newpage
+    
+    \input{pages/original_declaration}
+    \newpage
+    \hspace{0pt}
+    \newpage
+    
+    \input{pages/consent_declaration}
+    \newpage
+    \hspace{0pt}
+    \newpage
+    
+    \input{pages/rights}
+    \newpage
+    \hspace{0pt}
+    \newpage
+    
+    \tableofcontents
+    
+    % chapters
+    \setcounter{page}{1}
+    \pagenumbering{arabic}
+    \newpage
+    \input{chapters/introduction}
+    \input{chapters/contributions}
+    \input{chapters/application_description}
+    \input{chapters/system_architecture}
+    \input{chapters/applications}
+    \input{chapters/development_considerations}
+    \input{chapters/use_cases}
+    \input{chapters/conclusions}
+    \input{chapters/bibliography}
+
+\end{document}

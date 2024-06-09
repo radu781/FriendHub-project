@@ -1,0 +1,186 @@
+\chapter{System architecture}
+    \section{General architecture}
+    Ca orice aplicație centralizată creată pentru a servi clienților, proiectul este împărțit pe două componente: cea cu care clientul interacționează (frontend) și cea care se ocupă de logică (backend).
+
+    Aplicația folosește modelul MVC (model-view-controller) pentru a avea o mai bună organizare a codului și a separa reprezentările interne ale informației de modul în care informația ajunge și este folosită de client. Acesst model arhitectural este des întâlnit în aplicații cu interfață grafică (GUI), și din ce în ce mai des și pe pagini web. 
+    
+    Ca mod de funcționare:
+    \begin{enumerate}[noitemsep, label=\textbullet, leftmargin=0.3cm]
+        \item Utilizatorul folosește controller-ul, adică atunci când face click pe un buton, caută un alt utilizator după nume, sau dă scroll pe pagina principală pentru a încărca mai multe postări se face request la un anume endpoint creat de controller. Acesta acceptă informația primită de la utilizator și o procesează pentru a crea comenzi ce vor fi folosite de model.
+        \item Controller-ul manipulează datele din model, componenta centrală ce presupune gestionarea datelor și a logicii. În model se calculează recomandările de postări și de prieteni în funcție de preferințele utilizatorului, a grupurilor din care face parte și a interacțiunilor cu postări în trecut.
+        \item Modelul furnizează și actualizează interfața, o reprezentare cât mai ușoară de înțeles a datelor, care mai apoi va fi folosită de utilizator. Interfața urmează un design minimalist, care prioritizează acțiunile cele mai comune la un moment dat, ascunzându-le pe cele mai puțin frecvente. 
+    \end{enumerate}
+    
+    \section{Communication}
+    \subsection{WSGI}
+    A Web Server Gateway Interface is the name given to web servers that send requests to web based applications written using the python language. It is an interface between web servers and web applications that makes portability possible and has two sides: a gateway that runs either Apache or Nginx and an application that is the python codebase itself. The way the applicaton is started, configured or loaded is not specified, so depending on the framework used, developers might need to make custom adjustments to start their server.
+    WSGI also supports middleware: a component that can route requests, enable load balancing, developer debugging and profiling.
+    \subsection{Socket.IO}
+    Socket.IO is a scalable library designed to real time web applications that enables bidirectional communication between the server and web clients. The API on both sides is similar. The connection is usually made using WebSocket, thus providing little overhead in the communication process.
+    \subsection{gRPC}
+    gRPC Remote Procedure Calls is a high performance RPC framework. It was originally designed by Google and is now used in many organizations other than Google in microservices, mobile, web and Internet of Things.
+
+    Protocol buffers are used as the IDL(interface definition language) and includes features such as authentication, flow control, blocking or non blocking bindings, and bidirectionial data streaming. It can generate cross platform server and client bindings for many languages. They are used to serialize and deserialize structured data, usually over networks, while being faster than json, xml or other text based serialization methods. Data is compact, forward and backward compatible, but not self describing (meaning that names, datatypes, methods cannot be known without also having the proto file). Messages(data structure schemas) and services are defined in a proto file and later compiled. This generates code that can be used by a sender or reciever that can represent those data structures. The best use case for this kind of file is for small data chunks that are only loaded into memory and should not be used for streaming data.
+    
+    \section{Backend}
+    The backend portion of the application handles the authentication, the database connection, data processing and exposes a public API. This is split into multiple functional parts:
+    \begin{enumerate}[noitemsep, label=\textbullet, leftmargin=0.3cm]
+        \item a WSGI server that creates the controller with its endpoints that are used to nagivate between pages
+        \item a Socket.IO server that enables users to use instant messaging
+        \item a gRPC server used to communicate between the main WSGI server and real time notifications or various self made micro services
+    \end{enumerate}
+
+    
+    \subsection{Used technologies}
+    Limbajul de programare folosit pentru partea de backend este python, un limbaj de nivel înalt, multi-paradigmă, cu scop general. Având tipuri de date dinamice, o librărie standard foarte complexă și fiind garbage-collected, python a devenit un limbaj folosit din ce în ce mai des pentru ușurința de a dezvolta aplicații pornind de la mici scripturi folosite la linia de comandă, la automatizare, machine learning, web scraping până la aplicații web sau desktop. 
+
+    Flask este un framework WSGI folosit pentru crearea aplicațiilor web. Chiar dacă este conceput pentru crearea rapidă a proiectelor, poate scala ușor pentru aplicații mai complexe, fără a crea probleme legate de aspecte low-level precum organizarea firelor de execuție, a conexiunilor cu clienții și per total a protocolului folosit. Fiind open source, există o multitudine de unelte și îmbunătățiri create de diverși dezvoltatori. În producție, este folosit de multe companii: reddit, uber, trivago.
+
+    The backend part of the application is dependant on some libraries to be able to function, since Flask already provides implementations for many use cases and scenarios. Their importance varies, as some of them could be rewritten manually in a timely manner, but others have years of work behind them and are the backbone of any python based web backend.
+    
+    \subsubsection{Psycopg2}
+    ...
+    \subsubsection{Pyjwt}
+    ...
+    \subsubsection{Qrcode}
+    ...
+    \subsubsection{Cryptography}
+    Fernet
+
+    \subsection{Controller}
+    The controller in a web application is a critical component that handles incoming requests from the client, processes these requests, interacts with the database or other backend services, and returns the appropriate response to the client. The controller acts as an intermediary between the user interface and the backend logic, ensuring that data flows correctly between the frontend and backend components of the application.
+
+
+    Different endpoints are used for different scenarios in FriendHub: related to authentication, posts, user relationships, activity status, profile and statistics.
+
+    \subsubsection{API}
+    API stands for Application Programming Interface. It is a set of rules and protocols that allows different software applications to communicate with each other. An API defines the methods and data formats that applications can use to request and exchange information, enabling seamless integration and interaction between different systems and software components.
+
+    It provides an organized and structured way to communicate, that ensures that requests and responses follow a specified and well documented format. Since REST requests can be made from any language on any platform on any Internet connected device, the API is highly interoperable. Security is provided because of JWT based tokens required in the Authentication header of any authenticated request.
+
+\subsection{Database}
+    A database is an organized collection of structured information or data, typically stored electronically in a computer system. Databases are managed by Database Management Systems (DBMS), which provide tools and functionalities for creating, reading, updating, and deleting data, ensuring data integrity, security, and efficiency in data handling. Provides mechanisms for organizing, storing, and retrieving data. Databases can handle large volumes of data and support concurrent access by multiple users.
+
+    Data is stored in a structured format, making it easy to access, manage, and update. The structure can vary, including tables, documents, key-value pairs, or graphs, depending on the type of database.
+    
+    SQL is the standard language used to interact with a database. It allows for querying, updating, and managing the data.
+
+    \subsubsection{RDBMS}
+    RDBMS stands for Relational Database Management System. It is a type of database management system that stores data in a structured format, using rows and columns, which are collectively known as tables. An RDBMS uses SQL (Structured Query Language) for database access and management.
+
+    Data is organized nto tables, which consist of rows and columns. Each row represents a record, and each column represents a field in the record. Tables can be related to each other through foreign keys, which allows for the establishment of relationships between different data sets.
+    Postgresql
+    
+    RDBMS follow the ACID rules: atomicity ensures that transactions are all-or-nothing, consistency ensures that a transaction brings the database from one valid state to another, isolation ensures that concurrently executing transactions do not affect each other, and durability ensures that once a transaction is committed, it remains so, even in the case of a system failure.
+
+    \subsubsection{NoSQL}
+    Designed for unstructured data and can handle a variety of data formats. They provide flexibility and scalability for large-scale data storage.
+ 
+    There are multiple types of NoSQL databases, depending on the type of data stored. Document Databases store data in JSON or BSON format (MongoDB), Key-Value Stores store data as key-value pairs (Redis), Column-Family Stores store data in columns rather than rows (Apache Cassandra) and Graph Databases store data as nodes and relationships (Neo4j).
+
+    \subsubsection{Other types}
+    In-Memory Databases store data in the system's main memory (RAM) for faster access and performance. They are ideal for applications requiring real-time data processing. Redis, Memcached use this system.
+    
+    NewSQL Databases combine the ACID properties of traditional RDBMS with the scalability of NoSQL databases. They are designed to handle large-scale data and high transaction rates. Examples include Google Spanner and CockroachDB.
+    
+    \subsubsection{Indexes}
+
+    Alegere tipuri de date/formatul datelor
+    \subsection{Integration with public services}
+    The application uses data obtained from public and free third party APIs, the limit being only the volume of data that can be transferred. Some resources can be accessed from the user's profile in order to set preferences that can later be used to find friends or relevant groups.
+
+    \subsubsection{IP-API}
+    IP-API - Geolocation API for new login requests
+
+    
+    \subsection{Other tools}
+    \label{Other tools}
+    The application uses several tools written in rust that compute various data either at fixed points in time, or as needed. These tools are comand line interface applicatons that serve singular purposes. These could have been defined as microservices, but for the sake of simplicity and avoiding the problem where an application has more microservices than active users, they are executables called by the controller.
+
+    These tools share a common error outputting interface, every possible failable case is treated and either handled or by graceful exit. In the controller, depending on the tools's exit code, the action may be repeated up to a maximum number of types. A priority queue system has been implemented in order to facilitate this.
+
+    Since all of these are command line tools, a common library used was \hyperref[lib-claprs]{clap}, a full featured, fast command line argument parser that uses procedural macros on structs in order to define possible commands and flags.
+
+    \subsubsection{Database lib}
+    A wrapper over the database tables has been written in order to facilitate database related queries, run them asynchronously, and ensure safety and query corectness at compile time, even before the code runs. The library also logs the data it manipulates so it can be manually be reviewed or automatically reverted. It abstracts away the low level and error prone SQL queries.
+    
+    The library used for this is \hyperref[lib-sqlxrs]{sqlx}, a rust SQL toolkit that creates compile time checked queries for PostreSQL, MySQL, MariaDB and SQLite meaning that if the code compiles, the interactions with the database are correct and crash free. When reading multiple rows from a table, data streaming is supported, so rows are read and decoded asynchronously and on demand. This library uses macros to run queries at compile time to check the table column types, restrictions, triggers, can map to objects created in rust either automatically or manually (for conversions, for example char to UUID).
+    
+    \subsubsection{Email}
+    The application uses emails to inform the user of specific events: new registration, login from unknown device, password reset. The email type and relevant information is provided as command line arguments, then the email is rendered and sent to the recipient.
+
+    The rendering library used is \hyperref[lib-tera]{tera}. It is easy to use, performant and uses Jinja2 template files which are widely used. Conditional rendering is supported, as well as loops filters and inheritance. The email sent is an html file that can support inline CSS and javascript. The templates are loaded at compile time, which makes the tool very portable, since for using it, only the executable needs to be copied, without the various Jinja2 files.
+
+    For sending the emails, the library of choice was \hyperref[lib-lettre]{lettre}. It supports multiple transport methods, unicode, SMTP and can be used asynchronously. The API is easy to use and setting up a message that uses Google's gmail STMP server can be done in a couple of lines.
+    
+    \subsubsection{Activity tracker}
+    A part of the application is to be able to compare a user's daily or montly activity and engagement to the website. This component is gamified, in which different metrics have different weights based on the ammount of effort the action required and its type. Positive and creational inputs have a higher weight in order to encourage good morale and to guide users to avoid bad behaviours (trolling, negative comments, hate).
+
+    Other than clap, this tool uses the internal database library mentioned above in order to compute a user's activity score in a certain day and store it back in the databse. The metrics that take part in this computation are: number of posts, number of upvotes and downvotes given, number of new friends added, number of comments and replies written, number of timed story posts, number of comment/reply chains created, number of groups joined. Bad behaviour on the platform, depending on its kind, can be punished by an activity negative multiplier, while streaks award positive multipliers.
+    
+    \subsubsection{Data mock}
+    In order to test different scenarios, to create relationships between test users and for demonstration purposes, some of the data is generated. Instead of using random text or fragments of lorem ipsum, plausible data is inserted into the database.
+
+    By using \hyperref[lib-fakers]{fake-rs}, fake data can be easily generated in order to create users (names, locations, addresses), posts, pages, comments (text, upvote/downvote count). This library uses procedural macros to specity the types of generated data, and can also support parameters, such as creating names longer than 3 characters, numbers in a given interval, sentences with a given length, dates and much more.
+
+    \section{Frontend}
+    Frontend refers to the part of a software application or website that the user directly interacts with. It encompasses everything the user experiences, such as the visual design, layout, and user interface elements. Two most important components of any frontend are the User Interface (UI) composed of the visual elements that users interact with, including buttons, forms, menus, and other components, and the User Experience (UX) which is the overall experience of a user when interacting with a website or application, focusing on ease of use, efficiency, and satisfaction.
+    \subsection{Used technologies}
+    Limbajul de programare folosit pentru partea de frontend este rust, un limbaj multi-paradigmă ce excelează în performanță, asigurarea siguranței tipurilor de date și concurență. Impune siguranța memoriei fără a se folosi de un garbage collector și previne accesul destructiv și concurent la resurse partajate, în schimb folosește un sistem de "borrow checking" ce urmărește durata de viață a unui obiect la compilare. Chiar dacă este folosit în principal pentru programare software, are funcționalități de nivel înalt și un package manager ce permit folosirea pentru multe alte arii.
+
+    \begin{quote}
+        "Rust is on its seventh year as the most loved language with 87\% of developers saying they want to continue using it. Rust also ties with Python as the most wanted technology with TypeScript running a close second." \hyperref[stackoverflow-studiu-2022]{\textsuperscript{Stackoverflow survey 2022 [1]}}
+    \end{quote}
+    \begin{quote}
+        "Rust is the most admired language, more than 80\% of developers that use it want to use it again next year." \hyperref[stackoverflow-studiu-2023]{\textsuperscript{Stackoverflow survery 2023 [2]}}
+    \end{quote}
+
+    Yew este un framework folosit pentru crearea aplicațiilor web, bazat pe componente ce ajută la crearea ușoară a interfețelor grafice. Fiind bazat pe React din punctul de vedere al funcționalității și sintaxei, codul poate fi ușor convertit, iar documentații și ghiduri pentru React pot fi folosite ca referință pentru aplicații în yew. O diferență majoră este faptul că yew folosește WebAssembly pentru a executa codul, în defavoarea Javascript. WASM este un limbaj care poate rula în browsere moderne cu performanță aproape de nativ, poate interacționa cu cod deja existent în Javascript și paote fi generat de diverse limbaje compilate.
+
+
+    The frontend part of the application is dependant on many libraries to be able to function. Their importance varies, as some of them could be rewritten manually in a timely manner, but others have years of work behind them and are the backbone of any rust based web frontend.
+    
+    \subsubsection{Wasm bindgen}
+    ...
+    \subsubsection{Reqwest}
+    ...
+    \subsubsection{Serde}
+    ...
+    \subsubsection{Stylist}
+    ...
+    
+    
+    \subsection{Web assembly}
+    ...
+
+    \section{Hosting}
+    \subsection{Virtual private server}
+    \subsubsection{Linode}
+    \subsubsection{nginx}
+    \subsection{Domain}
+    
+    \section{Interconnected}
+    ...
+    
+    \subsection{Technologies used}
+    ... 
+    
+    \subsection{Instant messaging}
+    ...
+    
+    \subsection{Live notificatons}
+    ...
+    
+    \subsection{Microservices}
+    ...
+    
+    \section{Aspecte de securitate}
+    \subsection{Authentication and authorization}
+    ...
+    Stocare JWT ...
+
+    Autentificare ...
+
+    Email-uri de confirmate/securitate ...
+    
+\newpage
