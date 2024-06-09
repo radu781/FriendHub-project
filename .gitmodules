@@ -1,15 +1,15 @@
-[submodule "FriendHub-backend"]
+[submodule "backend"]
 	path = backend
 	url = https://github.com/radu781/FriendHub-backend
-[submodule "FriendHub-tools"]
+[submodule "tools"]
 	path = tools
 	url = https://github.com/radu781/FriendHub-tools
-[submodule "FriendHub-frontend"]
+[submodule "frontend"]
 	path = frontend
 	url = https://github.com/radu781/FriendHub-frontend
-[submodule "FriendHub-desktop"]
+[submodule "desktop"]
 	path = desktop
 	url = https://github.com/radu781/FriendHub-desktop
-[submodule "FriendHub-live"]
+[submodule "live"]
 	path = live
 	url = https://github.com/radu781/FriendHub-live
